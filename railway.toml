@@ -1,0 +1,22 @@
+# Railway Platform Configuration
+# https://docs.railway.app/reference/config-as-code
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "nginx -g 'daemon off;'"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+# Environment-specific settings
+[environments.production]
+[environments.production.deploy]
+numReplicas = 1
+
+[environments.preview]
+[environments.preview.deploy]
+numReplicas = 1

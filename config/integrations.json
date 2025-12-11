@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "blackroad-integrations",
+  "version": "1.0.0",
+  "description": "Platform integrations configuration for BlackRoad OS",
+
+  "authentication": {
+    "clerk": {
+      "enabled": false,
+      "description": "Clerk authentication provider",
+      "docs": "https://clerk.com/docs",
+      "envVars": [
+        "CLERK_PUBLISHABLE_KEY",
+        "CLERK_SECRET_KEY",
+        "CLERK_WEBHOOK_SECRET"
+      ],
+      "features": ["sso", "mfa", "session-management", "user-management"]
+    }
+  },
+
+  "payments": {
+    "stripe": {
+      "enabled": false,
+      "description": "Stripe payment processing",
+      "docs": "https://stripe.com/docs",
+      "envVars": [
+        "STRIPE_PUBLISHABLE_KEY",
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET"
+      ],
+      "features": ["payments", "subscriptions", "invoicing", "checkout"],
+      "webhookEvents": [
+        "checkout.session.completed",
+        "customer.subscription.created",
+        "customer.subscription.updated",
+        "customer.subscription.deleted",
+        "invoice.paid",
+        "invoice.payment_failed"
+      ]
+    }
+  },
+
+  "productivity": {
+    "asana": {
+      "enabled": false,
+      "description": "Asana project management integration",
+      "docs": "https://developers.asana.com/docs",
+      "envVars": [
+        "ASANA_ACCESS_TOKEN",
+        "ASANA_WORKSPACE_GID"
+      ],
+      "features": ["tasks", "projects", "webhooks", "search"],
+      "scopes": ["default"]
+    },
+    "notion": {
+      "enabled": false,
+      "description": "Notion workspace integration",
+      "docs": "https://developers.notion.com",
+      "envVars": [
+        "NOTION_API_KEY",
+        "NOTION_DATABASE_ID"
+      ],
+      "features": ["databases", "pages", "blocks", "search"],
+      "capabilities": ["read_content", "update_content", "insert_content"]
+    }
+  },
+
+  "deployment": {
+    "railway": {
+      "enabled": true,
+      "configFile": "railway.toml",
+      "envVars": ["RAILWAY_TOKEN"],
+      "docs": "https://docs.railway.app"
+    },
+    "vercel": {
+      "enabled": true,
+      "configFile": "vercel.json",
+      "envVars": ["VERCEL_TOKEN", "VERCEL_ORG_ID", "VERCEL_PROJECT_ID"],
+      "docs": "https://vercel.com/docs"
+    },
+    "cloudflare": {
+      "enabled": true,
+      "configFile": "wrangler.toml",
+      "envVars": ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"],
+      "docs": "https://developers.cloudflare.com"
+    },
+    "digitalocean": {
+      "enabled": true,
+      "configFile": ".do/app.yaml",
+      "envVars": ["DIGITALOCEAN_ACCESS_TOKEN"],
+      "docs": "https://docs.digitalocean.com/products/app-platform"
+    },
+    "huggingface": {
+      "enabled": true,
+      "configFile": "README.hf.md",
+      "envVars": ["HF_TOKEN"],
+      "docs": "https://huggingface.co/docs/hub"
+    }
+  },
+
+  "tunnels": {
+    "cloudflared": {
+      "enabled": false,
+      "description": "Cloudflare Tunnel for secure ingress",
+      "envVars": ["CLOUDFLARE_TUNNEL_TOKEN"],
+      "configFile": "config/cloudflared.yml"
+    },
+    "ngrok": {
+      "enabled": false,
+      "description": "ngrok tunnels for development",
+      "envVars": ["NGROK_AUTHTOKEN"],
+      "configFile": "config/ngrok.yml"
+    },
+    "tailscale": {
+      "enabled": false,
+      "description": "Tailscale mesh VPN",
+      "envVars": ["TAILSCALE_AUTHKEY"],
+      "docs": "https://tailscale.com/kb"
+    }
+  },
+
+  "ai": {
+    "huggingface": {
+      "enabled": false,
+      "description": "Hugging Face Inference API",
+      "envVars": ["HF_TOKEN"],
+      "docs": "https://huggingface.co/docs/api-inference"
+    },
+    "ollama": {
+      "enabled": false,
+      "description": "Local AI inference with Ollama",
+      "endpoint": "http://localhost:11434",
+      "docs": "https://ollama.ai"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+# Cloudflare Workers/Pages Configuration
+# https://developers.cloudflare.com/workers/wrangler/configuration/
+
+name = "blackroad-hello"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Account settings (set via environment or secrets)
+# account_id = ""
+
+# Workers settings
+workers_dev = true
+route = { pattern = "*/*", zone_name = "" }
+
+# Build configuration
+[build]
+command = ""
+watch_dir = "src"
+
+# Environment configurations
+[env.production]
+name = "blackroad-hello"
+routes = []
+
+[env.preview]
+name = "blackroad-hello-preview"
+workers_dev = true
+
+# Static assets (for Pages)
+[site]
+bucket = "./"
+include = ["index.html", "assets/*"]
+exclude = ["node_modules/*", ".git/*"]
+
+# Variables
+[vars]
+ENVIRONMENT = "production"
+
+# Durable Objects (if needed)
+# [[durable_objects.bindings]]
+# name = "STATE"
+# class_name = "StateObject"
+
+# KV Namespaces (if needed)
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = ""
+
+# R2 Buckets (if needed)
+# [[r2_buckets]]
+# binding = "STORAGE"
+# bucket_name = ""
+
+# D1 Databases (if needed)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = ""
+# database_id = ""
+
+# Secrets (set via wrangler secret put)
+# - API_KEY
+# - JWT_SECRET

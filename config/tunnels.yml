@@ -1,0 +1,80 @@
+# Tunnel Configurations
+# Secure access to local services without exposing ports
+
+# =============================================================================
+# Cloudflare Tunnel (cloudflared)
+# =============================================================================
+# Setup: cloudflared tunnel login
+#        cloudflared tunnel create blackroad
+#        cloudflared tunnel route dns blackroad your-domain.com
+cloudflared:
+  tunnel: blackroad
+  credentials-file: /root/.cloudflared/credentials.json
+
+  ingress:
+    - hostname: app.your-domain.com
+      service: http://localhost:80
+    - hostname: api.your-domain.com
+      service: http://localhost:3000
+    - hostname: "*"
+      service: http_status:404
+
+  originRequest:
+    connectTimeout: 30s
+    noTLSVerify: false
+    noHappyEyeballs: false
+    httpHostHeader: ""
+    originServerName: ""
+
+# =============================================================================
+# ngrok Configuration
+# =============================================================================
+# Setup: ngrok config add-authtoken <token>
+ngrok:
+  version: "3"
+  agent:
+    authtoken: ${NGROK_AUTHTOKEN}
+
+  tunnels:
+    web:
+      proto: http
+      addr: 80
+      inspect: true
+      domain: your-app.ngrok.io  # Custom domain if available
+
+    api:
+      proto: http
+      addr: 3000
+      inspect: true
+
+# =============================================================================
+# Tailscale Funnel
+# =============================================================================
+# Setup: tailscale up --authkey=$TAILSCALE_AUTHKEY
+#        tailscale funnel 443 on
+tailscale:
+  hostname: blackroad
+  advertise-routes: ""
+  accept-routes: false
+
+  funnel:
+    - port: 443
+      service: http://localhost:80
+
+# =============================================================================
+# SSH Tunnel (for development/debugging)
+# =============================================================================
+# Usage: ssh -L 8080:localhost:80 user@server
+ssh_tunnel:
+  local_port: 8080
+  remote_host: localhost
+  remote_port: 80
+
+# =============================================================================
+# Bore (simple TCP tunnel)
+# =============================================================================
+# Setup: cargo install bore-cli
+#        bore local 80 --to bore.pub
+bore:
+  local_port: 80
+  server: bore.pub

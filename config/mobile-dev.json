@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "mobile-development-config",
+  "version": "1.0.0",
+  "description": "Configuration for mobile development tools and iOS Git clients",
+
+  "workingCopy": {
+    "description": "Working Copy - Git client for iOS",
+    "docs": "https://workingcopy.app/manual/",
+    "setup": {
+      "cloneUrl": "working-copy://clone?remote=https://github.com/BlackRoad-OS/blackroad-hello.git",
+      "features": [
+        "Full Git support",
+        "SSH key management",
+        "Conflict resolution",
+        "Diff viewing",
+        "Branch management"
+      ]
+    },
+    "integration": {
+      "shortcuts": true,
+      "filesApp": true,
+      "shareExtension": true
+    },
+    "syncSettings": {
+      "autoFetch": true,
+      "fetchInterval": 300,
+      "pushOnCommit": false
+    }
+  },
+
+  "shellfish": {
+    "description": "Shellfish - SFTP/SSH client for iOS",
+    "docs": "https://shellfishapp.com",
+    "setup": {
+      "protocol": "sftp",
+      "features": [
+        "SSH terminal",
+        "SFTP file browser",
+        "Key-based authentication",
+        "Port forwarding",
+        "Files app integration"
+      ]
+    },
+    "servers": [
+      {
+        "name": "Development Server",
+        "host": "${DEV_SERVER_HOST}",
+        "port": 22,
+        "username": "${DEV_SERVER_USER}",
+        "authMethod": "publicKey",
+        "keyPath": "~/.ssh/id_ed25519"
+      },
+      {
+        "name": "Production Server",
+        "host": "${PROD_SERVER_HOST}",
+        "port": 22,
+        "username": "${PROD_SERVER_USER}",
+        "authMethod": "publicKey",
+        "keyPath": "~/.ssh/id_ed25519"
+      }
+    ],
+    "shortcuts": {
+      "quickConnect": true,
+      "filesProvider": true
+    }
+  },
+
+  "pyto": {
+    "description": "Pyto - Python IDE for iOS",
+    "docs": "https://pyto.app",
+    "setup": {
+      "pythonVersion": "3.11",
+      "features": [
+        "Full Python interpreter",
+        "Package installation (pip)",
+        "Jupyter notebook support",
+        "Files app integration",
+        "Shortcuts automation"
+      ]
+    },
+    "packages": [
+      "requests",
+      "httpx",
+      "pyyaml",
+      "python-dotenv",
+      "rich"
+    ],
+    "scripts": {
+      "deploy": "scripts/deploy.py",
+      "healthcheck": "scripts/healthcheck.py",
+      "sync": "scripts/sync.py"
+    },
+    "workingCopyIntegration": {
+      "enabled": true,
+      "repoPath": "working-copy://x-callback-url/open?repo=blackroad-hello"
+    }
+  },
+
+  "warp": {
+    "description": "Warp - Modern terminal with AI",
+    "docs": "https://docs.warp.dev",
+    "setup": {
+      "platform": ["macOS", "Linux"],
+      "features": [
+        "AI command suggestions",
+        "Block-based output",
+        "Collaborative features",
+        "Custom workflows",
+        "SSH integration"
+      ]
+    },
+    "configuration": {
+      "theme": "dark",
+      "font": "JetBrains Mono",
+      "fontSize": 14,
+      "aiEnabled": true
+    },
+    "workflows": [
+      {
+        "name": "Deploy to Railway",
+        "command": "railway up --detach"
+      },
+      {
+        "name": "Deploy to Vercel",
+        "command": "vercel --prod"
+      },
+      {
+        "name": "Deploy to Cloudflare",
+        "command": "wrangler deploy"
+      },
+      {
+        "name": "Docker Build & Run",
+        "command": "docker-compose up --build -d"
+      }
+    ],
+    "aliases": {
+      "gst": "git status",
+      "gco": "git checkout",
+      "gcm": "git commit -m",
+      "gp": "git push",
+      "gl": "git pull",
+      "dc": "docker-compose",
+      "k": "kubectl"
+    }
+  },
+
+  "aCode": {
+    "description": "aCode - Code editor for Android",
+    "docs": "https://acode.foxdebug.com",
+    "setup": {
+      "features": [
+        "Syntax highlighting",
+        "Git integration",
+        "FTP/SFTP support",
+        "Plugin system",
+        "Console/Terminal"
+      ]
+    },
+    "plugins": [
+      "git",
+      "prettier",
+      "emmet"
+    ]
+  },
+
+  "termux": {
+    "description": "Termux - Linux terminal for Android",
+    "docs": "https://termux.dev",
+    "setup": {
+      "packages": [
+        "git",
+        "nodejs",
+        "python",
+        "openssh",
+        "docker"
+      ],
+      "storage": "termux-setup-storage"
+    },
+    "scripts": {
+      "install": "pkg update && pkg upgrade && pkg install git nodejs python openssh"
+    }
+  }
+}
