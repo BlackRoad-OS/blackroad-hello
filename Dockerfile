@@ -1,4 +1,12 @@
-FROM nginx:alpine
-COPY --chmod=644 index.html /usr/share/nginx/html/index.html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+
+EXPOSE 8080
+
+CMD ["npm", "start"]
