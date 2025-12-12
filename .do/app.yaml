@@ -1,0 +1,44 @@
+# DigitalOcean App Platform Specification
+# https://docs.digitalocean.com/products/app-platform/reference/app-spec/
+
+name: blackroad-hello
+region: nyc
+
+services:
+  - name: web
+    dockerfile_path: Dockerfile
+    github:
+      repo: BlackRoad-OS/blackroad-hello
+      branch: main
+      deploy_on_push: true
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    http_port: 80
+    routes:
+      - path: /
+    health_check:
+      http_path: /
+      initial_delay_seconds: 10
+      period_seconds: 30
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    cors:
+      allow_origins:
+        - prefix: "*"
+      allow_methods:
+        - GET
+        - HEAD
+        - OPTIONS
+      allow_headers:
+        - Content-Type
+      max_age: "86400"
+    envs:
+      - key: NODE_ENV
+        value: production
+        scope: RUN_AND_BUILD_TIME
+
+# Alerts configuration
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
