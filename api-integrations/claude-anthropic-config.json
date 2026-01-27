@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json.schemastore.org/anthropic-integration",
+  "name": "Claude/Anthropic Integration",
+  "version": "1.0.0",
+  "description": "Anthropic Claude API integration for AI agents and code assistance",
+
+  "api": {
+    "base_url": "https://api.anthropic.com",
+    "api_version": "2023-06-01",
+    "auth_type": "x-api-key",
+    "env_var": "ANTHROPIC_API_KEY"
+  },
+
+  "models": {
+    "claude-opus-4-5-20251101": {
+      "alias": "opus",
+      "description": "Most capable model for complex reasoning",
+      "max_tokens": 32000,
+      "use_cases": ["complex_code", "architecture", "deep_analysis"]
+    },
+    "claude-sonnet-4-20250514": {
+      "alias": "sonnet",
+      "description": "Balanced performance and speed",
+      "max_tokens": 16000,
+      "use_cases": ["code_review", "implementation", "debugging"]
+    },
+    "claude-3-5-haiku-20241022": {
+      "alias": "haiku",
+      "description": "Fast and efficient for simple tasks",
+      "max_tokens": 8000,
+      "use_cases": ["quick_queries", "formatting", "simple_fixes"]
+    }
+  },
+
+  "endpoints": {
+    "messages": {
+      "path": "/v1/messages",
+      "method": "POST",
+      "description": "Main chat/completion endpoint"
+    },
+    "messages_batch": {
+      "path": "/v1/messages/batches",
+      "method": "POST",
+      "description": "Batch processing for multiple requests"
+    },
+    "token_count": {
+      "path": "/v1/messages/count_tokens",
+      "method": "POST",
+      "description": "Count tokens before sending"
+    }
+  },
+
+  "tools": {
+    "code_execution": {
+      "name": "bash",
+      "description": "Execute shell commands",
+      "enabled": true
+    },
+    "file_operations": {
+      "name": "file_ops",
+      "description": "Read, write, edit files",
+      "enabled": true
+    },
+    "web_search": {
+      "name": "web_search",
+      "description": "Search the web for information",
+      "enabled": true
+    },
+    "mcp_servers": {
+      "enabled": true,
+      "servers": [
+        "github",
+        "filesystem",
+        "postgres",
+        "slack"
+      ]
+    }
+  },
+
+  "agent_config": {
+    "agents": {
+      "aria": {
+        "name": "ARIA",
+        "role": "Infrastructure Queen",
+        "model": "claude-sonnet-4-20250514",
+        "specializations": [
+          "infrastructure_architecture",
+          "cost_optimization",
+          "multi_cloud_orchestration",
+          "disaster_recovery"
+        ],
+        "system_prompt_ref": ".aria/agent-identity.md"
+      },
+      "cecilia": {
+        "name": "Cecilia",
+        "role": "Claude Coordination",
+        "model": "claude-opus-4-5-20251101",
+        "specializations": [
+          "agent_coordination",
+          "task_distribution",
+          "context_management",
+          "workflow_orchestration"
+        ]
+      },
+      "lucidia": {
+        "name": "Lucidia",
+        "role": "AI/ML Specialist",
+        "model": "claude-opus-4-5-20251101",
+        "specializations": [
+          "machine_learning",
+          "model_training",
+          "data_analysis",
+          "ai_optimization"
+        ]
+      },
+      "alice": {
+        "name": "Alice",
+        "role": "Migration Architect",
+        "model": "claude-sonnet-4-20250514",
+        "specializations": [
+          "repo_migration",
+          "code_modernization",
+          "dependency_updates",
+          "ci_cd_setup"
+        ]
+      }
+    },
+
+    "coordination": {
+      "event_bus": "nats",
+      "handoff_protocol": "greenlight",
+      "memory_store": "cloudflare_kv",
+      "max_concurrent_agents": 4
+    }
+  },
+
+  "rate_limits": {
+    "requests_per_minute": 50,
+    "tokens_per_minute": 100000,
+    "retry_strategy": {
+      "max_retries": 3,
+      "backoff_type": "exponential",
+      "initial_delay_ms": 1000
+    }
+  },
+
+  "webhooks": {
+    "agent_started": "/api/webhooks/claude/agent-started",
+    "agent_completed": "/api/webhooks/claude/agent-completed",
+    "agent_error": "/api/webhooks/claude/agent-error"
+  }
+}
