@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json.schemastore.org/mobile-ios-integration",
+  "name": "Mobile/iOS Development Integration",
+  "version": "1.0.0",
+  "description": "Integration configs for Termius, iSH, ShellFish, Working Copy, Pyto, and other iOS development tools",
+
+  "termius": {
+    "name": "Termius",
+    "description": "SSH/SFTP client for remote server management",
+    "platform": ["ios", "macos", "android", "windows", "linux"],
+    "integration_type": "ssh_client",
+    "features": {
+      "ssh": true,
+      "sftp": true,
+      "mosh": true,
+      "port_forwarding": true,
+      "snippets": true,
+      "team_sync": true
+    },
+    "config": {
+      "hosts_sync": {
+        "enabled": true,
+        "source": "termius_cloud",
+        "export_format": "json"
+      },
+      "snippets": [
+        {
+          "name": "blackroad-deploy",
+          "command": "cd /opt/blackroad && git pull && npm run deploy"
+        },
+        {
+          "name": "blackroad-logs",
+          "command": "tail -f /var/log/blackroad/*.log"
+        },
+        {
+          "name": "blackroad-status",
+          "command": "systemctl status blackroad-*"
+        },
+        {
+          "name": "docker-cleanup",
+          "command": "docker system prune -af && docker volume prune -f"
+        }
+      ],
+      "hosts": {
+        "pi_cluster": {
+          "group": "BlackRoad Pi Cluster",
+          "hosts": [
+            { "name": "pi-aria", "hostname": "pi-aria.local", "port": 22 },
+            { "name": "pi-node-1", "hostname": "pi-node-1.local", "port": 22 },
+            { "name": "pi-node-2", "hostname": "pi-node-2.local", "port": 22 }
+          ]
+        },
+        "cloud_servers": {
+          "group": "Cloud Servers",
+          "hosts": [
+            { "name": "do-primary", "hostname": "blackroad-primary.nyc1.digitalocean.com", "port": 22 },
+            { "name": "do-backup", "hostname": "blackroad-backup.sfo1.digitalocean.com", "port": 22 }
+          ]
+        }
+      }
+    },
+    "api_integration": {
+      "url": "https://api.termius.com",
+      "auth": "oauth2",
+      "env_var": "TERMIUS_API_TOKEN"
+    }
+  },
+
+  "ish": {
+    "name": "iSH",
+    "description": "Linux shell environment for iOS (Alpine Linux)",
+    "platform": ["ios"],
+    "integration_type": "local_shell",
+    "features": {
+      "alpine_linux": true,
+      "apk_packages": true,
+      "file_sharing": true,
+      "location_background": true
+    },
+    "config": {
+      "default_packages": [
+        "git",
+        "nodejs",
+        "npm",
+        "python3",
+        "py3-pip",
+        "curl",
+        "jq",
+        "openssh-client",
+        "vim"
+      ],
+      "setup_script": "#!/bin/sh\napk update && apk upgrade\napk add git nodejs npm python3 py3-pip curl jq openssh-client vim\nnpm install -g @anthropic-ai/claude-code\npip3 install anthropic requests",
+      "workspace_mount": "/blackroad",
+      "env_vars": {
+        "BLACKROAD_ENV": "ios-ish",
+        "PATH": "/usr/local/bin:/usr/bin:/bin"
+      }
+    },
+    "file_providers": [
+      "files_app",
+      "icloud_drive",
+      "working_copy"
+    ]
+  },
+
+  "shellfish": {
+    "name": "ShellFish (Secure ShellFish)",
+    "description": "Advanced SSH/SFTP client with Shortcuts integration",
+    "platform": ["ios", "macos"],
+    "integration_type": "ssh_client",
+    "features": {
+      "ssh": true,
+      "sftp": true,
+      "mosh": true,
+      "agent_forwarding": true,
+      "shortcuts_integration": true,
+      "files_app_integration": true,
+      "widgets": true
+    },
+    "config": {
+      "shortcuts_actions": [
+        {
+          "name": "Deploy BlackRoad",
+          "action": "run_ssh_command",
+          "host": "primary-server",
+          "command": "cd /opt/blackroad && ./deploy.sh"
+        },
+        {
+          "name": "Check Status",
+          "action": "run_ssh_command",
+          "host": "primary-server",
+          "command": "blackroad-status"
+        },
+        {
+          "name": "Sync Files",
+          "action": "sftp_sync",
+          "local": "/blackroad",
+          "remote": "/opt/blackroad"
+        }
+      ],
+      "file_providers": {
+        "enabled": true,
+        "auto_mount": true
+      }
+    }
+  },
+
+  "working_copy": {
+    "name": "Working Copy",
+    "description": "Git client for iOS with full clone support",
+    "platform": ["ios", "macos"],
+    "integration_type": "git_client",
+    "features": {
+      "full_git": true,
+      "clone": true,
+      "push_pull": true,
+      "branch_management": true,
+      "merge_conflicts": true,
+      "file_provider": true,
+      "shortcuts_integration": true,
+      "external_editor_support": true
+    },
+    "config": {
+      "repositories": {
+        "blackroad_os": {
+          "org": "BlackRoad-OS",
+          "repos": [
+            "blackroad-hello",
+            "blackroad-core",
+            "blackroad-api",
+            "blackroad-agents"
+          ]
+        }
+      },
+      "sync_settings": {
+        "auto_fetch": true,
+        "fetch_interval_minutes": 15,
+        "auto_push": false
+      },
+      "shortcuts_actions": [
+        {
+          "name": "Pull All Repos",
+          "action": "pull_repository",
+          "repos": "all"
+        },
+        {
+          "name": "Commit Changes",
+          "action": "commit",
+          "message_prompt": true
+        },
+        {
+          "name": "Push to Remote",
+          "action": "push"
+        }
+      ],
+      "external_editors": [
+        "textastic",
+        "kodex",
+        "pyto",
+        "juno"
+      ]
+    },
+    "url_scheme": {
+      "clone": "working-copy://clone?remote={url}",
+      "open_file": "working-copy://open?repo={repo}&path={path}",
+      "pull": "working-copy://pull?repo={repo}",
+      "push": "working-copy://push?repo={repo}"
+    }
+  },
+
+  "pyto": {
+    "name": "Pyto",
+    "description": "Python IDE for iOS with full library support",
+    "platform": ["ios", "macos"],
+    "integration_type": "ide",
+    "features": {
+      "python3": true,
+      "pip_packages": true,
+      "jupyter_notebooks": true,
+      "shortcuts_integration": true,
+      "file_provider": true,
+      "widgets": true,
+      "background_scripts": true
+    },
+    "config": {
+      "default_packages": [
+        "anthropic",
+        "openai",
+        "requests",
+        "httpx",
+        "pydantic",
+        "python-dotenv",
+        "click",
+        "rich",
+        "typer",
+        "fastapi",
+        "uvicorn"
+      ],
+      "scripts": {
+        "blackroad_client": {
+          "name": "BlackRoad Client",
+          "description": "API client for BlackRoad services",
+          "path": "scripts/blackroad_client.py"
+        },
+        "claude_chat": {
+          "name": "Claude Chat",
+          "description": "Interactive Claude assistant",
+          "path": "scripts/claude_chat.py"
+        },
+        "deploy_trigger": {
+          "name": "Deploy Trigger",
+          "description": "Trigger deployments via API",
+          "path": "scripts/deploy_trigger.py"
+        }
+      },
+      "shortcuts_actions": [
+        {
+          "name": "Run BlackRoad Script",
+          "script": "blackroad_client.py",
+          "arguments_prompt": true
+        }
+      ]
+    },
+    "url_scheme": {
+      "run_script": "pyto://run?script={path}",
+      "open_file": "pyto://open?path={path}"
+    }
+  },
+
+  "additional_apps": {
+    "a_shell": {
+      "name": "a-Shell",
+      "description": "iOS terminal with Unix commands",
+      "platform": ["ios"],
+      "features": ["vim", "python", "lua", "tex", "ffmpeg"]
+    },
+    "textastic": {
+      "name": "Textastic",
+      "description": "Code editor with syntax highlighting",
+      "platform": ["ios", "macos"],
+      "features": ["syntax_highlighting", "sftp", "working_copy_integration"]
+    },
+    "kodex": {
+      "name": "Kodex",
+      "description": "Code editor with Git support",
+      "platform": ["ios"],
+      "features": ["syntax_highlighting", "git", "terminal"]
+    },
+    "juno": {
+      "name": "Juno",
+      "description": "Jupyter notebook client",
+      "platform": ["ios"],
+      "features": ["jupyter", "python", "data_science"]
+    },
+    "github_mobile": {
+      "name": "GitHub Mobile",
+      "description": "Official GitHub app",
+      "platform": ["ios", "android"],
+      "features": ["issues", "prs", "notifications", "code_review"]
+    },
+    "blink_shell": {
+      "name": "Blink Shell",
+      "description": "Professional SSH/Mosh client",
+      "platform": ["ios"],
+      "features": ["ssh", "mosh", "code_server", "tmux"]
+    }
+  },
+
+  "cross_app_workflows": {
+    "mobile_development": {
+      "description": "Complete iOS development workflow",
+      "steps": [
+        { "app": "working_copy", "action": "pull_latest" },
+        { "app": "textastic", "action": "edit_code" },
+        { "app": "pyto", "action": "run_tests" },
+        { "app": "working_copy", "action": "commit_push" },
+        { "app": "shellfish", "action": "deploy_via_ssh" }
+      ]
+    },
+    "server_management": {
+      "description": "Remote server management workflow",
+      "steps": [
+        { "app": "termius", "action": "connect_server" },
+        { "app": "shellfish", "action": "transfer_files" },
+        { "app": "github_mobile", "action": "review_prs" }
+      ]
+    }
+  }
+}

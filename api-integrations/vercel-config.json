@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json.schemastore.org/vercel-integration",
+  "name": "Vercel Integration",
+  "version": "1.0.0",
+  "description": "Vercel deployment and edge function integration",
+
+  "api": {
+    "base_url": "https://api.vercel.com",
+    "auth_type": "bearer_token",
+    "env_var": "VERCEL_TOKEN",
+    "team_id_env": "VERCEL_TEAM_ID"
+  },
+
+  "endpoints": {
+    "projects": {
+      "list": "GET /v9/projects",
+      "get": "GET /v9/projects/{projectId}",
+      "create": "POST /v9/projects",
+      "update": "PATCH /v9/projects/{projectId}",
+      "delete": "DELETE /v9/projects/{projectId}"
+    },
+
+    "deployments": {
+      "list": "GET /v6/deployments",
+      "get": "GET /v13/deployments/{deploymentId}",
+      "create": "POST /v13/deployments",
+      "cancel": "PATCH /v12/deployments/{deploymentId}/cancel",
+      "delete": "DELETE /v13/deployments/{deploymentId}"
+    },
+
+    "domains": {
+      "list": "GET /v5/domains",
+      "get": "GET /v5/domains/{domain}",
+      "add": "POST /v5/domains",
+      "remove": "DELETE /v6/domains/{domain}",
+      "verify": "POST /v5/domains/{domain}/verify"
+    },
+
+    "env_vars": {
+      "list": "GET /v9/projects/{projectId}/env",
+      "create": "POST /v10/projects/{projectId}/env",
+      "update": "PATCH /v9/projects/{projectId}/env/{envId}",
+      "delete": "DELETE /v9/projects/{projectId}/env/{envId}"
+    },
+
+    "edge_config": {
+      "list": "GET /v1/edge-config",
+      "get": "GET /v1/edge-config/{configId}",
+      "create": "POST /v1/edge-config",
+      "update": "PATCH /v1/edge-config/{configId}/items",
+      "delete": "DELETE /v1/edge-config/{configId}"
+    },
+
+    "logs": {
+      "get": "GET /v2/deployments/{deploymentId}/events",
+      "runtime": "GET /v2/projects/{projectId}/logs"
+    },
+
+    "analytics": {
+      "web_analytics": "GET /v1/web-analytics/projects/{projectId}",
+      "speed_insights": "GET /v1/speed-insights/projects/{projectId}"
+    }
+  },
+
+  "features": {
+    "edge_functions": {
+      "enabled": true,
+      "runtime": "edge",
+      "regions": ["iad1", "sfo1", "hnd1", "cdg1", "gru1"]
+    },
+
+    "serverless_functions": {
+      "enabled": true,
+      "runtime": "nodejs20.x",
+      "memory": 1024,
+      "max_duration": 60
+    },
+
+    "edge_config": {
+      "enabled": true,
+      "use_for_state": true,
+      "config_name": "blackroad-state"
+    },
+
+    "preview_deployments": {
+      "enabled": true,
+      "comments": true,
+      "protection": "password"
+    },
+
+    "analytics": {
+      "web_analytics": true,
+      "speed_insights": true
+    }
+  },
+
+  "github_integration": {
+    "enabled": true,
+    "auto_deploy_branches": ["main", "develop"],
+    "preview_branches": true,
+    "commit_status": true,
+    "comments": true
+  },
+
+  "webhooks": {
+    "deployment_created": "/api/webhooks/vercel/deployment-created",
+    "deployment_ready": "/api/webhooks/vercel/deployment-ready",
+    "deployment_error": "/api/webhooks/vercel/deployment-error",
+    "project_created": "/api/webhooks/vercel/project-created"
+  }
+}
