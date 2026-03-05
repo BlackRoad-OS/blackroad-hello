@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json.schemastore.org/additional-services",
+  "name": "Additional Services Integration",
+  "version": "1.0.0",
+  "description": "Railway, Render, Supabase, Turso, Neon, and other platform integrations",
+
+  "railway": {
+    "name": "Railway",
+    "api": {
+      "base_url": "https://backboard.railway.app/graphql/v2",
+      "auth_type": "bearer_token",
+      "env_var": "RAILWAY_TOKEN"
+    },
+    "features": {
+      "auto_deploy": true,
+      "preview_environments": true,
+      "cron_jobs": true,
+      "private_networking": true
+    },
+    "endpoints": {
+      "projects": "query { projects { edges { node { id name } } } }",
+      "deployments": "query { deployments(projectId: $id) { edges { node { id status } } } }",
+      "services": "query { services(projectId: $id) { edges { node { id name } } } }"
+    }
+  },
+
+  "render": {
+    "name": "Render",
+    "api": {
+      "base_url": "https://api.render.com/v1",
+      "auth_type": "bearer_token",
+      "env_var": "RENDER_API_KEY"
+    },
+    "services": {
+      "web_services": true,
+      "static_sites": true,
+      "background_workers": true,
+      "cron_jobs": true,
+      "private_services": true
+    },
+    "endpoints": {
+      "services": "/services",
+      "deploys": "/services/{serviceId}/deploys",
+      "env_groups": "/env-groups"
+    }
+  },
+
+  "supabase": {
+    "name": "Supabase",
+    "api": {
+      "base_url": "https://api.supabase.com/v1",
+      "auth_type": "bearer_token",
+      "env_var": "SUPABASE_ACCESS_TOKEN"
+    },
+    "project_api": {
+      "base_url": "https://{project_ref}.supabase.co",
+      "anon_key_env": "SUPABASE_ANON_KEY",
+      "service_role_env": "SUPABASE_SERVICE_ROLE_KEY"
+    },
+    "features": {
+      "database": "postgresql",
+      "auth": true,
+      "storage": true,
+      "edge_functions": true,
+      "realtime": true
+    }
+  },
+
+  "turso": {
+    "name": "Turso (LibSQL)",
+    "api": {
+      "base_url": "https://api.turso.tech/v1",
+      "auth_type": "bearer_token",
+      "env_var": "TURSO_API_TOKEN"
+    },
+    "database": {
+      "url_env": "TURSO_DATABASE_URL",
+      "auth_token_env": "TURSO_AUTH_TOKEN"
+    },
+    "features": {
+      "embedded_replicas": true,
+      "edge_locations": true,
+      "multi_db": true
+    }
+  },
+
+  "neon": {
+    "name": "Neon (Serverless Postgres)",
+    "api": {
+      "base_url": "https://console.neon.tech/api/v2",
+      "auth_type": "bearer_token",
+      "env_var": "NEON_API_KEY"
+    },
+    "features": {
+      "branching": true,
+      "autoscaling": true,
+      "point_in_time_restore": true
+    }
+  },
+
+  "planetscale": {
+    "name": "PlanetScale",
+    "api": {
+      "base_url": "https://api.planetscale.com/v1",
+      "auth_type": "bearer_token",
+      "env_var": "PLANETSCALE_TOKEN"
+    },
+    "features": {
+      "branching": true,
+      "deploy_requests": true,
+      "insights": true
+    }
+  },
+
+  "upstash": {
+    "name": "Upstash",
+    "services": {
+      "redis": {
+        "api_url": "https://api.upstash.com/v2/redis",
+        "env_vars": {
+          "url": "UPSTASH_REDIS_URL",
+          "token": "UPSTASH_REDIS_TOKEN"
+        }
+      },
+      "kafka": {
+        "api_url": "https://api.upstash.com/v2/kafka",
+        "env_vars": {
+          "url": "UPSTASH_KAFKA_URL",
+          "username": "UPSTASH_KAFKA_USERNAME",
+          "password": "UPSTASH_KAFKA_PASSWORD"
+        }
+      },
+      "qstash": {
+        "api_url": "https://qstash.upstash.io",
+        "env_var": "QSTASH_TOKEN"
+      }
+    }
+  },
+
+  "resend": {
+    "name": "Resend",
+    "api": {
+      "base_url": "https://api.resend.com",
+      "auth_type": "bearer_token",
+      "env_var": "RESEND_API_KEY"
+    },
+    "features": {
+      "transactional_email": true,
+      "webhooks": true,
+      "domains": true
+    }
+  },
+
+  "linear": {
+    "name": "Linear",
+    "api": {
+      "base_url": "https://api.linear.app/graphql",
+      "auth_type": "bearer_token",
+      "env_var": "LINEAR_API_KEY"
+    },
+    "features": {
+      "issues": true,
+      "projects": true,
+      "cycles": true,
+      "github_integration": true
+    }
+  },
+
+  "notion": {
+    "name": "Notion",
+    "api": {
+      "base_url": "https://api.notion.com/v1",
+      "auth_type": "bearer_token",
+      "env_var": "NOTION_API_KEY",
+      "version": "2022-06-28"
+    },
+    "features": {
+      "databases": true,
+      "pages": true,
+      "blocks": true,
+      "search": true
+    }
+  },
+
+  "slack": {
+    "name": "Slack",
+    "api": {
+      "base_url": "https://slack.com/api",
+      "auth_type": "bearer_token",
+      "env_var": "SLACK_BOT_TOKEN"
+    },
+    "features": {
+      "messages": true,
+      "channels": true,
+      "webhooks": true,
+      "slash_commands": true
+    },
+    "webhook_url_env": "SLACK_WEBHOOK_URL"
+  },
+
+  "discord": {
+    "name": "Discord",
+    "api": {
+      "base_url": "https://discord.com/api/v10",
+      "auth_type": "bot_token",
+      "env_var": "DISCORD_BOT_TOKEN"
+    },
+    "features": {
+      "messages": true,
+      "webhooks": true,
+      "slash_commands": true
+    },
+    "webhook_url_env": "DISCORD_WEBHOOK_URL"
+  },
+
+  "nats": {
+    "name": "NATS",
+    "description": "Event bus for agent coordination",
+    "connection": {
+      "url_env": "NATS_URL",
+      "default_url": "nats://localhost:4222"
+    },
+    "subjects": {
+      "agent_events": "blackroad.agents.>",
+      "deployment_events": "blackroad.deploy.>",
+      "project_events": "blackroad.projects.>"
+    }
+  }
+}

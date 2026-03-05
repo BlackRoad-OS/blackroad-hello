@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json.schemastore.org/cloudflare-integration",
+  "name": "Cloudflare Integration",
+  "version": "1.0.0",
+  "description": "Cloudflare Workers, Pages, KV, D1, R2, and DNS integration",
+
+  "api": {
+    "base_url": "https://api.cloudflare.com/client/v4",
+    "auth_type": "bearer_token",
+    "env_var": "CLOUDFLARE_API_TOKEN",
+    "account_id_env": "CLOUDFLARE_ACCOUNT_ID"
+  },
+
+  "services": {
+    "workers": {
+      "enabled": true,
+      "endpoint": "/accounts/{account_id}/workers/scripts",
+      "routes": "/zones/{zone_id}/workers/routes",
+      "capabilities": [
+        "deploy_worker",
+        "list_workers",
+        "delete_worker",
+        "get_worker_settings",
+        "update_worker_settings"
+      ]
+    },
+
+    "pages": {
+      "enabled": true,
+      "endpoint": "/accounts/{account_id}/pages/projects",
+      "capabilities": [
+        "create_project",
+        "deploy_project",
+        "list_deployments",
+        "rollback_deployment",
+        "get_deployment_logs"
+      ]
+    },
+
+    "kv": {
+      "enabled": true,
+      "endpoint": "/accounts/{account_id}/storage/kv/namespaces",
+      "use_for_state": true,
+      "namespaces": {
+        "projects_state": "BLACKROAD_PROJECTS_STATE",
+        "crm_data": "BLACKROAD_CRM_DATA",
+        "agent_memory": "BLACKROAD_AGENT_MEMORY",
+        "session_cache": "BLACKROAD_SESSION_CACHE"
+      },
+      "capabilities": [
+        "read_key",
+        "write_key",
+        "delete_key",
+        "list_keys",
+        "bulk_write",
+        "bulk_delete"
+      ]
+    },
+
+    "d1": {
+      "enabled": true,
+      "endpoint": "/accounts/{account_id}/d1/database",
+      "databases": {
+        "main": "blackroad-main-db",
+        "analytics": "blackroad-analytics-db"
+      },
+      "capabilities": [
+        "query",
+        "execute",
+        "create_table",
+        "list_tables"
+      ]
+    },
+
+    "r2": {
+      "enabled": true,
+      "endpoint": "/accounts/{account_id}/r2/buckets",
+      "buckets": {
+        "assets": "blackroad-assets",
+        "backups": "blackroad-backups",
+        "logs": "blackroad-logs"
+      },
+      "capabilities": [
+        "put_object",
+        "get_object",
+        "delete_object",
+        "list_objects"
+      ]
+    },
+
+    "dns": {
+      "enabled": true,
+      "endpoint": "/zones/{zone_id}/dns_records",
+      "capabilities": [
+        "create_record",
+        "update_record",
+        "delete_record",
+        "list_records"
+      ]
+    },
+
+    "analytics": {
+      "enabled": true,
+      "endpoint": "/graphql",
+      "capabilities": [
+        "workers_analytics",
+        "pages_analytics",
+        "dns_analytics",
+        "firewall_events"
+      ]
+    }
+  },
+
+  "state_sync": {
+    "enabled": true,
+    "kv_namespace": "BLACKROAD_PROJECTS_STATE",
+    "sync_interval_seconds": 30,
+    "data_types": [
+      "project_status",
+      "issue_state",
+      "pr_state",
+      "agent_tasks",
+      "deployment_status"
+    ]
+  },
+
+  "webhooks": {
+    "worker_deployment": "/api/webhooks/cloudflare/workers",
+    "pages_deployment": "/api/webhooks/cloudflare/pages",
+    "dns_changes": "/api/webhooks/cloudflare/dns"
+  }
+}

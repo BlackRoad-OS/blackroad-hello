@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json.schemastore.org/github-projects-api",
+  "name": "BlackRoad Projects API Integration",
+  "version": "1.0.0",
+  "description": "GitHub Projects v2 API integration with CRM-style state management",
+
+  "github_projects": {
+    "api_version": "v2",
+    "graphql_endpoint": "https://api.github.com/graphql",
+    "rest_endpoint": "https://api.github.com",
+    "scopes_required": [
+      "repo",
+      "project",
+      "read:project",
+      "write:project",
+      "admin:org"
+    ],
+
+    "project_fields": {
+      "status": {
+        "type": "single_select",
+        "options": [
+          { "name": "Backlog", "color": "GRAY", "emoji": "📋" },
+          { "name": "Ready", "color": "BLUE", "emoji": "🔵" },
+          { "name": "In Progress", "color": "YELLOW", "emoji": "🟡" },
+          { "name": "In Review", "color": "PURPLE", "emoji": "🟣" },
+          { "name": "Blocked", "color": "RED", "emoji": "🔴" },
+          { "name": "Done", "color": "GREEN", "emoji": "🟢" },
+          { "name": "Archived", "color": "GRAY", "emoji": "📦" }
+        ]
+      },
+      "priority": {
+        "type": "single_select",
+        "options": [
+          { "name": "Critical", "color": "RED", "emoji": "🚨" },
+          { "name": "High", "color": "ORANGE", "emoji": "🔥" },
+          { "name": "Medium", "color": "YELLOW", "emoji": "⚡" },
+          { "name": "Low", "color": "BLUE", "emoji": "💧" }
+        ]
+      },
+      "size": {
+        "type": "single_select",
+        "options": [
+          { "name": "XS", "points": 1 },
+          { "name": "S", "points": 2 },
+          { "name": "M", "points": 3 },
+          { "name": "L", "points": 5 },
+          { "name": "XL", "points": 8 },
+          { "name": "XXL", "points": 13 }
+        ]
+      },
+      "sprint": {
+        "type": "iteration",
+        "duration_weeks": 2
+      },
+      "assignee": {
+        "type": "assignees"
+      },
+      "labels": {
+        "type": "labels"
+      },
+      "linked_prs": {
+        "type": "linked_pull_requests"
+      },
+      "repository": {
+        "type": "repository"
+      },
+      "milestone": {
+        "type": "milestone"
+      },
+      "estimate": {
+        "type": "number"
+      },
+      "due_date": {
+        "type": "date"
+      },
+      "crm_stage": {
+        "type": "single_select",
+        "description": "Salesforce-style CRM pipeline stage",
+        "options": [
+          { "name": "Lead", "emoji": "🌱" },
+          { "name": "Qualified", "emoji": "✅" },
+          { "name": "Proposal", "emoji": "📝" },
+          { "name": "Negotiation", "emoji": "🤝" },
+          { "name": "Closed Won", "emoji": "🏆" },
+          { "name": "Closed Lost", "emoji": "❌" }
+        ]
+      }
+    },
+
+    "views": {
+      "board": {
+        "type": "board",
+        "group_by": "status",
+        "sort_by": "priority"
+      },
+      "table": {
+        "type": "table",
+        "columns": ["title", "status", "priority", "assignee", "due_date", "size"]
+      },
+      "roadmap": {
+        "type": "roadmap",
+        "date_field": "due_date",
+        "group_by": "milestone"
+      },
+      "crm_pipeline": {
+        "type": "board",
+        "group_by": "crm_stage",
+        "description": "Salesforce-style pipeline view"
+      }
+    },
+
+    "automations": {
+      "auto_move_on_pr_open": {
+        "trigger": "pull_request.opened",
+        "action": "set_field",
+        "field": "status",
+        "value": "In Review"
+      },
+      "auto_move_on_pr_merge": {
+        "trigger": "pull_request.merged",
+        "action": "set_field",
+        "field": "status",
+        "value": "Done"
+      },
+      "auto_move_on_issue_close": {
+        "trigger": "issue.closed",
+        "action": "set_field",
+        "field": "status",
+        "value": "Done"
+      },
+      "auto_add_from_repo": {
+        "trigger": "issue.opened",
+        "action": "add_to_project"
+      }
+    }
+  },
+
+  "crm_integration": {
+    "salesforce_style_features": {
+      "pipeline_tracking": true,
+      "contact_linking": true,
+      "opportunity_management": true,
+      "activity_timeline": true,
+      "custom_fields": true,
+      "automation_rules": true,
+      "reporting_dashboards": true
+    },
+
+    "state_management": {
+      "primary_source": "github_projects",
+      "sync_targets": ["cloudflare_kv", "salesforce_crm"],
+      "conflict_resolution": "last_write_wins",
+      "sync_frequency_seconds": 30
+    }
+  },
+
+  "webhooks": {
+    "project_events": [
+      "projects_v2_item.created",
+      "projects_v2_item.edited",
+      "projects_v2_item.deleted",
+      "projects_v2_item.archived",
+      "projects_v2_item.restored",
+      "projects_v2_item.reordered"
+    ],
+    "issue_events": [
+      "issues.opened",
+      "issues.closed",
+      "issues.labeled",
+      "issues.assigned"
+    ],
+    "pr_events": [
+      "pull_request.opened",
+      "pull_request.closed",
+      "pull_request.merged",
+      "pull_request.review_requested"
+    ]
+  }
+}
