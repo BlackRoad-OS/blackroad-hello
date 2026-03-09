@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json.schemastore.org/salesforce-integration",
+  "name": "Salesforce CRM Integration",
+  "version": "1.0.0",
+  "description": "Salesforce CRM integration for project and opportunity management",
+
+  "api": {
+    "base_url": "https://{instance}.salesforce.com",
+    "api_version": "v59.0",
+    "auth_type": "oauth2",
+    "oauth_endpoints": {
+      "authorize": "https://login.salesforce.com/services/oauth2/authorize",
+      "token": "https://login.salesforce.com/services/oauth2/token",
+      "revoke": "https://login.salesforce.com/services/oauth2/revoke"
+    },
+    "env_vars": {
+      "client_id": "SALESFORCE_CLIENT_ID",
+      "client_secret": "SALESFORCE_CLIENT_SECRET",
+      "refresh_token": "SALESFORCE_REFRESH_TOKEN",
+      "instance_url": "SALESFORCE_INSTANCE_URL"
+    }
+  },
+
+  "objects": {
+    "Account": {
+      "api_name": "Account",
+      "sync_enabled": true,
+      "github_mapping": {
+        "source": "organization",
+        "fields": {
+          "Name": "org.name",
+          "Description": "org.description",
+          "Website": "org.html_url"
+        }
+      }
+    },
+
+    "Contact": {
+      "api_name": "Contact",
+      "sync_enabled": true,
+      "github_mapping": {
+        "source": "user",
+        "fields": {
+          "FirstName": "user.name.split(' ')[0]",
+          "LastName": "user.name.split(' ')[1]",
+          "Email": "user.email",
+          "GitHub_Username__c": "user.login"
+        }
+      }
+    },
+
+    "Opportunity": {
+      "api_name": "Opportunity",
+      "sync_enabled": true,
+      "github_mapping": {
+        "source": "project_item",
+        "fields": {
+          "Name": "item.title",
+          "Description": "item.body",
+          "StageName": "item.crm_stage",
+          "CloseDate": "item.due_date",
+          "Amount": "item.estimate",
+          "GitHub_Issue_URL__c": "item.html_url"
+        }
+      },
+      "stages": [
+        { "name": "Prospecting", "probability": 10, "github_status": "Backlog" },
+        { "name": "Qualification", "probability": 20, "github_status": "Ready" },
+        { "name": "Needs Analysis", "probability": 30, "github_status": "In Progress" },
+        { "name": "Value Proposition", "probability": 50, "github_status": "In Progress" },
+        { "name": "Decision Makers", "probability": 60, "github_status": "In Review" },
+        { "name": "Proposal/Price Quote", "probability": 75, "github_status": "In Review" },
+        { "name": "Negotiation/Review", "probability": 90, "github_status": "In Review" },
+        { "name": "Closed Won", "probability": 100, "github_status": "Done" },
+        { "name": "Closed Lost", "probability": 0, "github_status": "Archived" }
+      ]
+    },
+
+    "Task": {
+      "api_name": "Task",
+      "sync_enabled": true,
+      "github_mapping": {
+        "source": "issue",
+        "fields": {
+          "Subject": "issue.title",
+          "Description": "issue.body",
+          "Status": "issue.state",
+          "Priority": "issue.labels.priority",
+          "ActivityDate": "issue.due_date"
+        }
+      }
+    },
+
+    "Case": {
+      "api_name": "Case",
+      "sync_enabled": true,
+      "github_mapping": {
+        "source": "issue",
+        "filter": "labels.includes('bug')",
+        "fields": {
+          "Subject": "issue.title",
+          "Description": "issue.body",
+          "Status": "issue.state",
+          "Priority": "issue.labels.priority",
+          "GitHub_Issue_Number__c": "issue.number"
+        }
+      }
+    }
+  },
+
+  "custom_objects": {
+    "GitHub_Repository__c": {
+      "fields": [
+        { "name": "Repository_Name__c", "type": "Text", "length": 255 },
+        { "name": "Repository_URL__c", "type": "URL" },
+        { "name": "Stars__c", "type": "Number" },
+        { "name": "Forks__c", "type": "Number" },
+        { "name": "Open_Issues__c", "type": "Number" },
+        { "name": "Last_Commit__c", "type": "DateTime" },
+        { "name": "Traffic_Light_Status__c", "type": "Picklist", "values": ["Green", "Yellow", "Red", "Blue"] }
+      ]
+    },
+
+    "GitHub_Pull_Request__c": {
+      "fields": [
+        { "name": "PR_Number__c", "type": "Number" },
+        { "name": "Title__c", "type": "Text", "length": 255 },
+        { "name": "Status__c", "type": "Picklist", "values": ["Open", "Merged", "Closed"] },
+        { "name": "Author__c", "type": "Lookup", "reference": "Contact" },
+        { "name": "Repository__c", "type": "Lookup", "reference": "GitHub_Repository__c" },
+        { "name": "SHA_Hash__c", "type": "Text", "length": 64 }
+      ]
+    }
+  },
+
+  "webhooks": {
+    "outbound_messages": [
+      {
+        "object": "Opportunity",
+        "events": ["created", "updated"],
+        "endpoint": "/api/webhooks/salesforce/opportunity"
+      },
+      {
+        "object": "Task",
+        "events": ["created", "updated", "completed"],
+        "endpoint": "/api/webhooks/salesforce/task"
+      }
+    ]
+  },
+
+  "sync_config": {
+    "direction": "bidirectional",
+    "conflict_resolution": "salesforce_wins",
+    "sync_frequency_minutes": 5,
+    "batch_size": 200
+  }
+}

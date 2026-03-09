@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json.schemastore.org/digitalocean-integration",
+  "name": "DigitalOcean Integration",
+  "version": "1.0.0",
+  "description": "DigitalOcean Droplets, App Platform, Spaces, and Kubernetes integration",
+
+  "api": {
+    "base_url": "https://api.digitalocean.com/v2",
+    "auth_type": "bearer_token",
+    "env_var": "DIGITALOCEAN_TOKEN"
+  },
+
+  "services": {
+    "droplets": {
+      "enabled": true,
+      "endpoint": "/droplets",
+      "capabilities": [
+        "create",
+        "delete",
+        "list",
+        "get",
+        "power_on",
+        "power_off",
+        "reboot",
+        "snapshot",
+        "resize"
+      ],
+      "default_config": {
+        "region": "nyc1",
+        "size": "s-1vcpu-1gb",
+        "image": "ubuntu-22-04-x64"
+      }
+    },
+
+    "app_platform": {
+      "enabled": true,
+      "endpoint": "/apps",
+      "capabilities": [
+        "create_app",
+        "update_app",
+        "delete_app",
+        "list_apps",
+        "get_deployment",
+        "create_deployment",
+        "cancel_deployment",
+        "get_logs"
+      ],
+      "spec_template": {
+        "name": "blackroad-app",
+        "region": "nyc",
+        "services": [
+          {
+            "name": "api",
+            "github": {
+              "repo": "BlackRoad-OS/blackroad-hello",
+              "branch": "main",
+              "deploy_on_push": true
+            },
+            "instance_count": 1,
+            "instance_size_slug": "basic-xxs"
+          }
+        ]
+      }
+    },
+
+    "spaces": {
+      "enabled": true,
+      "endpoint": "/spaces",
+      "s3_compatible": true,
+      "endpoint_url": "https://{region}.digitaloceanspaces.com",
+      "capabilities": [
+        "create_bucket",
+        "delete_bucket",
+        "list_buckets",
+        "put_object",
+        "get_object",
+        "delete_object",
+        "list_objects"
+      ],
+      "buckets": {
+        "assets": "blackroad-assets",
+        "backups": "blackroad-backups"
+      }
+    },
+
+    "kubernetes": {
+      "enabled": true,
+      "endpoint": "/kubernetes/clusters",
+      "capabilities": [
+        "create_cluster",
+        "delete_cluster",
+        "list_clusters",
+        "get_kubeconfig",
+        "add_node_pool",
+        "delete_node_pool",
+        "upgrade_cluster"
+      ],
+      "default_config": {
+        "region": "nyc1",
+        "version": "1.28.2-do.0",
+        "node_pools": [
+          {
+            "name": "worker-pool",
+            "size": "s-2vcpu-4gb",
+            "count": 3,
+            "auto_scale": true,
+            "min_nodes": 1,
+            "max_nodes": 5
+          }
+        ]
+      }
+    },
+
+    "databases": {
+      "enabled": true,
+      "endpoint": "/databases",
+      "capabilities": [
+        "create_cluster",
+        "delete_cluster",
+        "list_clusters",
+        "get_connection",
+        "create_db",
+        "create_user",
+        "list_backups",
+        "restore_backup"
+      ],
+      "supported_engines": ["pg", "mysql", "redis", "mongodb"]
+    },
+
+    "load_balancers": {
+      "enabled": true,
+      "endpoint": "/load_balancers",
+      "capabilities": [
+        "create",
+        "delete",
+        "list",
+        "update",
+        "add_droplets",
+        "remove_droplets"
+      ]
+    },
+
+    "vpcs": {
+      "enabled": true,
+      "endpoint": "/vpcs",
+      "capabilities": [
+        "create",
+        "delete",
+        "list",
+        "update",
+        "list_members"
+      ]
+    },
+
+    "firewalls": {
+      "enabled": true,
+      "endpoint": "/firewalls",
+      "capabilities": [
+        "create",
+        "delete",
+        "list",
+        "update",
+        "add_droplets",
+        "remove_droplets",
+        "add_rules",
+        "remove_rules"
+      ]
+    },
+
+    "domains": {
+      "enabled": true,
+      "endpoint": "/domains",
+      "capabilities": [
+        "create",
+        "delete",
+        "list",
+        "create_record",
+        "update_record",
+        "delete_record"
+      ]
+    },
+
+    "monitoring": {
+      "enabled": true,
+      "endpoint": "/monitoring",
+      "capabilities": [
+        "get_metrics",
+        "create_alert_policy",
+        "list_alert_policies",
+        "delete_alert_policy"
+      ]
+    }
+  },
+
+  "webhooks": {
+    "droplet_events": "/api/webhooks/digitalocean/droplet",
+    "app_deployment": "/api/webhooks/digitalocean/app",
+    "database_events": "/api/webhooks/digitalocean/database"
+  }
+}
