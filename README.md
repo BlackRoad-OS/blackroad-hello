@@ -25,7 +25,7 @@ This repository is part of the **BlackRoad OS** ecosystem - a ranked quantum AI 
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details
+BlackRoad Proprietary License - see [LICENSE](LICENSE) for details
 
 Copyright © 2025 BlackRoad OS, Inc. / Alexa Louise Amundson
 
